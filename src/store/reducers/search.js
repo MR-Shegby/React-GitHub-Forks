@@ -52,6 +52,7 @@ function searchReducer(state = initialState, action = {}) {
     case ERROR_SUGGESTIONS:
       return {
         ...state,
+        suggestions: [],
         isLoading: false,
         error: action.error,
       };

@@ -12,7 +12,7 @@ const initialState = {
   forks: [],
   forksLoading: true,
   repositoryLoading: true,
-  forksError: '',
+  forksError: null,
   repositoryError: '',
 }
 
@@ -23,7 +23,7 @@ const searchResultsReducer = (state = initialState, action) => {
         ...state,
         forks: [],
         forksLoading: true,
-        forksError: ''
+        forksError: null
       }
 
     case FETCH_FORKS_SUCCESS:
@@ -31,7 +31,7 @@ const searchResultsReducer = (state = initialState, action) => {
         ...state,
         forks: action.forks,
         forksLoading: false,
-        forksError: ''
+        forksError: null
       }
 
     case FETCH_FORKS_FAILURE:

@@ -13,7 +13,7 @@ import Paper from '@material-ui/core/Paper'
 import MenuItem from '@material-ui/core/MenuItem'
 import { withStyles } from '@material-ui/core/styles'
 
-import { 
+import {
   updateInputValue, 
   loadSuggestions, 
   clearSuggestions } from '../store/actions/search'
@@ -190,7 +190,9 @@ const mapStateToProps = ({ search }) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     onChange: (event, { newValue }) => dispatch(updateInputValue(newValue)),
+    // onSuggestionsFetchRequested: ({ value }) => dispatch(loadSuggestions(value)),
     onSuggestionsFetchRequested: ({ value }) => dispatch(loadSuggestions(value)),
+    // onSuggestionsFetchRequested: ({ value }) => dispatch({ type: 'LOAD_SUGGESTIONS', value}),
     onSuggestionsClearRequested: () => dispatch(clearSuggestions()),
     clearInput: () => dispatch(updateInputValue(''))
   }

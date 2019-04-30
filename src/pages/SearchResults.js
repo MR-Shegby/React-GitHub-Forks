@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { compose } from "recompose"
+import { compose } from 'redux'
 import PropTypes from 'prop-types'
 import queryString from 'query-string'
 
@@ -15,8 +15,9 @@ import AppBar from '../components/AppBar'
 import TableSearchList from '../components/AppTable'
 import ToggleBookmarksModal from '../components/ToggleBookmarksModal'
 import ErrorIndicator from '../components/ErrorIndicator'
-import { fetchForks, fetchRepository } from '../store/actions/searchResults'
-import { fetchBookmarks, addToBookmarks } from '../store/actions/bookmarks'
+
+import { loadRepository, loadForks } from '../store/actions/searchResults'
+import { loadBookmarks, addToBookmarks } from '../store/actions/bookmarks'
 
 const theme = createMuiTheme({
   typography: {useNextVariants: true}
@@ -83,16 +84,17 @@ class SearchResults extends Component {
   componentDidMount() {
     const { 
       location, 
-      fetchForks, 
-      fetchRepository, 
-      fetchBookmarks } = this.props
+      loadRepository,
+      loadForks,
+      loadBookmarks
+    } = this.props
 
     const page = getPage(location.pathname)
     const repository = getRepository(location.search)
 
-    fetchRepository(repository)
-    fetchForks(repository, page)
-    fetchBookmarks()
+    loadRepository(repository)
+    loadForks(repository, page)
+    loadBookmarks()
 
     this.setState({
       offset: (page - 1) * 25
@@ -100,18 +102,22 @@ class SearchResults extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { location, fetchForks, fetchRepository } = this.props
+    const { 
+      location, 
+      loadRepository,
+      loadForks
+    } = this.props
 
     const page = getPage(location.pathname)
     const repository = getRepository(location.search)
 
     if (this.props.location.search !== prevProps.location.search) {
-      fetchRepository(repository)
-      fetchForks(repository, page)
+      loadRepository(repository)
+      loadForks(repository, page)
     }
 
     if (this.props.location.pathname !== prevProps.location.pathname) {
-      fetchForks(repository, page)
+      loadForks(repository, page)
 
       this.setState({
         offset: (page - 1) * 25
@@ -238,14 +244,14 @@ class SearchResults extends Component {
               ? (<React.Fragment>
                   {paginationBox}
 
-                  {!isForksLoading 
-                    ? (<React.Fragment>
+                  {!isForksLoading
+                    ? forks.length
+                      ? (<React.Fragment>
                         {tableSearchListBox}
                         {paginationBox}
                       </React.Fragment>)
-                    : null}
-
-                  
+                      : (<div className={classes.zeroResults}>0 forks</div>)
+                    : null }
 
                   {toggleBookmarksModalBox}
                 </React.Fragment>)
@@ -263,26 +269,17 @@ SearchResults.propTypes = {
   classes: PropTypes.object.isRequired,
   repo: PropTypes.object.isRequired,
   forks: PropTypes.array.isRequired,
-  bookmarks: PropTypes.object.isRequired,
+  bookmarks: PropTypes.object,
   isForksLoading: PropTypes.bool,
   isRepositoryLoading: PropTypes.bool,
   forksError: PropTypes.string,
   repositoryError: PropTypes.string,
   location: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
-  fetchForks: PropTypes.func.isRequired,
-  fetchRepository: PropTypes.func.isRequired,
-  fetchBookmarks: PropTypes.func.isRequired,
+  loadForks: PropTypes.func.isRequired,
+  loadRepository: PropTypes.func.isRequired,
+  loadBookmarks: PropTypes.func.isRequired,
   addToBookmarks: PropTypes.func.isRequired,
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    fetchForks: (repository, page) => dispatch(fetchForks(repository, page)),
-    fetchRepository: (repository) => dispatch(fetchRepository(repository)),
-    fetchBookmarks: () => dispatch(fetchBookmarks()),
-    addToBookmarks: (fork) => dispatch(addToBookmarks(fork)),
-  }
 }
 
 const mapStateToProps = ({ searchResults, bookmarks}) => {
@@ -298,6 +295,6 @@ const mapStateToProps = ({ searchResults, bookmarks}) => {
 }
 
 export default compose(
-  connect(mapStateToProps, mapDispatchToProps),
+  connect(mapStateToProps, { loadRepository, loadForks, loadBookmarks, addToBookmarks}),
   withStyles(styles)
 )(SearchResults)

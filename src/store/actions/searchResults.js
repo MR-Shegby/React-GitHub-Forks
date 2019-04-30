@@ -1,12 +1,12 @@
-import axios from 'axios'
-
 import {
   FETCH_FORKS_REQUEST,
   FETCH_FORKS_SUCCESS,
   FETCH_FORKS_FAILURE,
+  LOAD_FORKS,
   FETCH_REPOSITORY_REQUEST,
   FETCH_REPOSITORY_SUCCESS,
-  FETCH_REPOSITORY_FAILURE
+  FETCH_REPOSITORY_FAILURE,
+  LOAD_REPOSITORY
 } from '../actionTypes'
 
 
@@ -30,6 +30,14 @@ const forksError = (error) => {
   }
 }
 
+const loadForks = (name, page) => {
+  return {
+    type: LOAD_FORKS,
+    name,
+    page
+  }
+}
+
 const repositoryRequested = () => {
   return {
     type: FETCH_REPOSITORY_REQUEST,
@@ -50,33 +58,20 @@ const repositoryError = (error) => {
   }
 }
 
-const fetchRepository = (name) => async (dispatch) => {
-  try {
-    dispatch(repositoryRequested())
-
-    const repo = await axios.get(`https://api.github.com/repos/${name}`)
-
-    dispatch(repositoryFetched(repo.data))
-
-  } catch(err) {
-    dispatch(repositoryError(err.message))
-  }
-}
-
-const fetchForks = (name, page) => async (dispatch) => {
-  try {
-    dispatch(forksRequested())
-
-    const forks = await axios.get(`https://api.github.com/repos/${name}/forks?page=${page}&per_page=25`)
-
-    dispatch(forksFetched(forks.data))
-
-  } catch (err) {
-    dispatch(forksError(err.message))
+const loadRepository = (name) => {
+  return {
+    type: LOAD_REPOSITORY,
+    name
   }
 }
 
 export {
-  fetchRepository,
-  fetchForks
+  forksRequested,
+  forksFetched,
+  forksError,
+  repositoryRequested,
+  repositoryFetched,
+  repositoryError,
+  loadRepository,
+  loadForks
 }

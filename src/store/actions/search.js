@@ -1,11 +1,10 @@
-import axios from 'axios'
-
 import {
   UPDATE_INPUT_VALUE,
   CLEAR_SUGGESTIONS,
   MAYBE_UPDATE_SUGGESTIONS,
   LOAD_SUGGESTIONS_BEGIN,
-  ERROR_SUGGESTIONS
+  ERROR_SUGGESTIONS,
+  LOAD_SUGGESTIONS
 } from '../actionTypes.js'
 
 function updateInputValue(value) {
@@ -42,26 +41,18 @@ function errorSuggestions(error) {
   }
 }
 
-const loadSuggestions = (value) => (dispatch) => {
-  dispatch(loadSuggestionsBegin())
-
-  if (value) {
-    axios.get(
-      `https://api.github.com/search/repositories?q=${value}+in:name&per_page=5`,
-      {auth: {
-          username: 'Shegby22',
-          password: 'Shegby262'}})
-      .then((res) => {
-        dispatch(maybeUpdateSuggestions(res.data.items, value))
-      })
-      .catch((err) => {
-        dispatch(errorSuggestions('Too many requests. Try later!'))
-      })
+function loadSuggestions(value) {
+  return {
+    type: LOAD_SUGGESTIONS,
+    value
   }
 }
 
 export {
+  loadSuggestionsBegin,
+  maybeUpdateSuggestions,
+  errorSuggestions,
   updateInputValue,
-  loadSuggestions,
-  clearSuggestions
+  clearSuggestions,
+  loadSuggestions
 }

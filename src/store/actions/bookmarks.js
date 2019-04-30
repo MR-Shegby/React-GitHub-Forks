@@ -1,12 +1,14 @@
-import database from '../../firebase'
-
 import {
   FETCH_BOOKMARKS_REQUEST,
   FETCH_BOOKMARKS_SUCCESS,
   FETCH_BOOKMARKS_FAILURE,
+  LOAD_BOOKMARKS,
   ADD_BOOKMARK_SUCCESS,
+  ADD_TO_BOOKMARKS,
   UPDATE_BOOKMARK_SUCCESS,
+  UPDATE_BOOKMARK,
   DELETE_BOOKMARK_SUCCESS,
+  DELETE_FROM_BOOKMARKS
 } from '../actionTypes.js'
 
 const bookmarksRequested = () => {
@@ -29,6 +31,12 @@ const bookmarksError = (error) => {
   }
 }
 
+const loadBookmarks = () => {
+  return {
+    type: LOAD_BOOKMARKS
+  }
+}
+
 const bookmarkAdded = (id, data) => {
   return {
     type: ADD_BOOKMARK_SUCCESS,
@@ -37,9 +45,24 @@ const bookmarkAdded = (id, data) => {
   }
 }
 
+const addToBookmarks = (fork) => {
+  return {
+    type: ADD_TO_BOOKMARKS,
+    fork
+  }
+}
+
 const bookmarkUpdated = (id, data) => {
   return {
     type: UPDATE_BOOKMARK_SUCCESS,
+    id,
+    data
+  }
+}
+
+const editBookmark = (id, data) => {
+  return {
+    type: UPDATE_BOOKMARK,
     id,
     data
   }
@@ -52,56 +75,22 @@ const bookmarkDeleted = (id) => {
   }
 }
 
-
-const fetchBookmarks = () => async (dispatch) => {
-  try {
-    dispatch(bookmarksRequested())
-
-    const bookmarksRef = await database.ref(`bookmarks`).once('value')
-    const bookmarks = bookmarksRef.val()
-
-    dispatch(bookmarksLoaded(bookmarks))
-
-  } catch (err) {
-    dispatch(bookmarksError(err))
+const deleteFromBookmarks = (id) => {
+  return {
+    type: DELETE_FROM_BOOKMARKS,
+    id
   }
-}
-
-const addToBookmarks = (fork) => async (dispatch) => {
-  const bookmark = {
-    id: fork.id,
-    name: fork.full_name, 
-    url: fork.html_url,
-  }
-
-  database.ref(`bookmarks/${fork.id}`).set(bookmark)
-    .then(() => {
-      dispatch(bookmarkAdded(fork.id, bookmark))
-    })
-    .catch(err => dispatch(bookmarksError(err)))
-}
-
-const editBookmark = (id, data) => async (dispatch) => {
-
-  database.ref(`bookmarks/${id}`).update(data)
-    .then(() => {
-      dispatch(bookmarkUpdated(id, data))
-    })
-    .catch(err => dispatch(bookmarksError(err)))
-}
-
-const deleteFromBookmarks = (id) => async (dispatch) => {
-
-  database.ref(`bookmarks/${id}`).remove()
-    .then(() => {
-      dispatch(bookmarkDeleted(id))
-    })
-    .catch(err => dispatch(bookmarksError(err)))
 }
 
 export {
-  fetchBookmarks,
+  loadBookmarks,
   addToBookmarks,
   editBookmark,
-  deleteFromBookmarks
+  deleteFromBookmarks,
+  bookmarksRequested,
+  bookmarksLoaded,
+  bookmarksError,
+  bookmarkAdded,
+  bookmarkUpdated,
+  bookmarkDeleted
 }
