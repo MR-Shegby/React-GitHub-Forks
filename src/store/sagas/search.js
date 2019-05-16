@@ -13,8 +13,8 @@ function* asyncLoadSuggestions({ value }) {
       const res = yield call(
         axios.get,
         `https://api.github.com/search/repositories?q=${value}+in:name&per_page=5`, {
-          username: 'Shegby22',
-          password: 'Shegby262'
+          username: '*****',
+          password: '*****'
         });
 
       yield put(maybeUpdateSuggestions(res.data.items, value))
